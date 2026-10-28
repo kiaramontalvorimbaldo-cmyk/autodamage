@@ -37,14 +37,16 @@ pipeline {
         CI = 'true'
         HUSKY = '0'
         NEXT_TELEMETRY_DISABLED = '1'
-        REPORTS_READY = 'false'
-        UNIT_STARTED = 'false'
-        E2E_STARTED = 'false'
-        APP_BUILD_OK = 'false'
     }
     stages {
         stage('Checkout y preparación') {
             steps {
+                script {
+                    env.REPORTS_READY = 'false'
+                    env.UNIT_STARTED = 'false'
+                    env.E2E_STARTED = 'false'
+                    env.APP_BUILD_OK = 'false'
+                }
                 checkout scm
                 script {
                     inProject {

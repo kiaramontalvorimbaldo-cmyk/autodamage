@@ -37,10 +37,11 @@
     ".next-followup-final/types/**/*.ts",
     ".next-followup-verified/types/**/*.ts",
     ".next-followup/types/**/*.ts",
+    ".next-verify-flow/types/**/*.ts",
     ".next-workflows-delivery/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-verify-flow/types/**/*.ts"
+    ".next-ci/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

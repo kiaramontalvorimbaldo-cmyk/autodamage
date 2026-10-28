@@ -1,0 +1,122 @@
+[
+  {
+    "codigo_pieza": "PARAGOLPES_DEL",
+    "pieza_nombre": "Paragolpes delantero",
+    "costo_repuesto_base": 180,
+    "horas_mano_obra": 2.5
+  },
+  {
+    "codigo_pieza": "PARAGOLPES_TRA",
+    "pieza_nombre": "Paragolpes trasero",
+    "costo_repuesto_base": 170,
+    "horas_mano_obra": 2.5
+  },
+  {
+    "codigo_pieza": "FARO_DEL_IZQ",
+    "pieza_nombre": "Faro delantero izquierdo",
+    "costo_repuesto_base": 120,
+    "horas_mano_obra": 1.0
+  },
+  {
+    "codigo_pieza": "FARO_DEL_DER",
+    "pieza_nombre": "Faro delantero derecho",
+    "costo_repuesto_base": 120,
+    "horas_mano_obra": 1.0
+  },
+  {
+    "codigo_pieza": "FARO_TRA_IZQ",
+    "pieza_nombre": "Faro trasero izquierdo",
+    "costo_repuesto_base": 70,
+    "horas_mano_obra": 0.8
+  },
+  {
+    "codigo_pieza": "FARO_TRA_DER",
+    "pieza_nombre": "Faro trasero derecho",
+    "costo_repuesto_base": 70,
+    "horas_mano_obra": 0.8
+  },
+  {
+    "codigo_pieza": "CAPO",
+    "pieza_nombre": "Capó",
+    "costo_repuesto_base": 260,
+    "horas_mano_obra": 3.0
+  },
+  {
+    "codigo_pieza": "GUARDABARRO_DEL_IZQ",
+    "pieza_nombre": "Guardabarros delantero izquierdo",
+    "costo_repuesto_base": 140,
+    "horas_mano_obra": 2.0
+  },
+  {
+    "codigo_pieza": "GUARDABARRO_DEL_DER",
+    "pieza_nombre": "Guardabarros delantero derecho",
+    "costo_repuesto_base": 140,
+    "horas_mano_obra": 2.0
+  },
+  {
+    "codigo_pieza": "PUERTA_DEL_IZQ",
+    "pieza_nombre": "Puerta delantera izquierda",
+    "costo_repuesto_base": 300,
+    "horas_mano_obra": 3.5
+  },
+  {
+    "codigo_pieza": "PUERTA_DEL_DER",
+    "pieza_nombre": "Puerta delantera derecha",
+    "costo_repuesto_base": 300,
+    "horas_mano_obra": 3.5
+  },
+  {
+    "codigo_pieza": "PUERTA_TRA_IZQ",
+    "pieza_nombre": "Puerta trasera izquierda",
+    "costo_repuesto_base": 280,
+    "horas_mano_obra": 3.5
+  },
+  {
+    "codigo_pieza": "PUERTA_TRA_DER",
+    "pieza_nombre": "Puerta trasera derecha",
+    "costo_repuesto_base": 280,
+    "horas_mano_obra": 3.5
+  },
+  {
+    "codigo_pieza": "PARABRISAS",
+    "pieza_nombre": "Parabrisas",
+    "costo_repuesto_base": 220,
+    "horas_mano_obra": 2.0
+  },
+  {
+    "codigo_pieza": "LUNETA_TRA",
+    "pieza_nombre": "Luneta trasera",
+    "costo_repuesto_base": 160,
+    "horas_mano_obra": 2.0
+  },
+  {
+    "codigo_pieza": "ESPEJO_IZQ",
+    "pieza_nombre": "Espejo retrovisor izquierdo",
+    "costo_repuesto_base": 60,
+    "horas_mano_obra": 0.5
+  },
+  {
+    "codigo_pieza": "ESPEJO_DER",
+    "pieza_nombre": "Espejo retrovisor derecho",
+    "costo_repuesto_base": 60,
+    "horas_mano_obra": 0.5
+  },
+  {
+    "codigo_pieza": "PORTON_MALETERO",
+    "pieza_nombre": "Portón del maletero",
+    "costo_repuesto_base": 290,
+    "horas_mano_obra": 3.0
+  },
+  {
+    "codigo_pieza": "PARRILLA",
+    "pieza_nombre": "Parrilla",
+    "costo_repuesto_base": 55,
+    "horas_mano_obra": 0.7
+  },
+  {
+    "codigo_pieza": "TAPA_COMBUSTIBLE",
+    "pieza_nombre": "Tapa de combustible",
+    "costo_repuesto_base": 25,
+    "horas_mano_obra": 0.4
+  }
+]

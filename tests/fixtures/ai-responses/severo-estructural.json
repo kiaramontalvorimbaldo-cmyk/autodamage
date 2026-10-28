@@ -1,0 +1,28 @@
+{
+  "vehiculo": { "marca": "Nissan", "modelo": "Versa" },
+  "piezas_detectadas": [
+    {
+      "codigo_pieza": "CAPO",
+      "accion": "SUSTITUIR",
+      "confianza": 0.9,
+      "imagen_indice": 0,
+      "bbox": [50, 0, 400, 300]
+    },
+    {
+      "codigo_pieza": "PARABRISAS",
+      "accion": "SUSTITUIR",
+      "confianza": 0.87,
+      "imagen_indice": 1,
+      "bbox": [100, 100, 600, 800]
+    }
+  ],
+  "nivel_severidad": "SEVERO",
+  "indicadores_estructurales": {
+    "dano_estructural": true,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": false,
+  "motivo_recaptura": null,
+  "confianza_global": 0.9
+}

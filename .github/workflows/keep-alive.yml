@@ -1,0 +1,14 @@
+name: Keep-alive
+
+on:
+  schedule:
+    - cron: '0 9 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hacer ping a /api/health
+        run: |
+          curl -fsS "${{ secrets.VERCEL_URL }}/api/health" || echo "keep-alive falló (se reintentará en 3 días)"

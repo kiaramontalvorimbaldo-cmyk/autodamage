@@ -1,0 +1,13 @@
+{
+  "vehiculo": { "marca": null, "modelo": null },
+  "piezas_detectadas": [],
+  "nivel_severidad": "LEVE",
+  "indicadores_estructurales": {
+    "dano_estructural": false,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": false,
+  "motivo_recaptura": null,
+  "confianza_global": 0.9
+}

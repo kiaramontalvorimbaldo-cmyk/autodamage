@@ -1,0 +1,21 @@
+{
+  "vehiculo": { "marca": "Toyota", "modelo": "Corolla" },
+  "piezas_detectadas": [
+    {
+      "codigo_pieza": "FARO_DEL_IZQ",
+      "accion": "SUSTITUIR",
+      "confianza": 0.95,
+      "imagen_indice": 0,
+      "bbox": [120, 80, 260, 300]
+    }
+  ],
+  "nivel_severidad": "LEVE",
+  "indicadores_estructurales": {
+    "dano_estructural": false,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": false,
+  "motivo_recaptura": null,
+  "confianza_global": 0.93
+}

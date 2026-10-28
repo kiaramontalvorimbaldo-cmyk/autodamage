@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 27% 97%;
+    --foreground: 213 40% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 27%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 27%;
+    --primary: 166 77% 26%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 215 25% 27%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 162 35% 94%;
+    --accent-foreground: 215 25% 27%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 211 22% 88%;
+    --input: 211 22% 84%;
+    --ring: 166 77% 26%;
+    --radius: 0.875rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #b4f3d9;
+    color: #0c2633;
+  }
+  :focus-visible {
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .auth-shell {
+    @apply min-h-screen lg:grid lg:grid-cols-[1.06fr_1fr];
+  }
+  .auth-showcase {
+    @apply relative hidden min-h-screen flex-col justify-between overflow-hidden px-12 py-10 text-white lg:flex xl:px-16;
+    background: radial-gradient(ellipse at 80% 35%, #1c4d51 0%, transparent 55%), #0c202e;
+  }
+  .auth-showcase::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.055;
+    background-image:
+      linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(transparent, black, transparent);
+    pointer-events: none;
+  }
+  .auth-story {
+    @apply relative z-10 my-12;
+  }
+  .brand-eyebrow {
+    @apply mb-6 flex items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-emerald-200;
+  }
+  .auth-story h2 {
+    font-size: clamp(2.6rem, 4.1vw, 4.5rem);
+    line-height: 1.06;
+    font-weight: 650;
+    letter-spacing: -0.055em;
+  }
+  .auth-story h2 span {
+    color: #97ebc9;
+  }
+  .auth-description {
+    @apply mt-6 max-w-sm text-[15px] leading-7 text-slate-300;
+  }
+  .vehicle-scene {
+    @apply relative -mx-5 my-5;
+    height: clamp(200px, 23vw, 300px);
+  }
+  .vehicle-drawing {
+    @apply absolute inset-0 h-full w-full;
+    filter: drop-shadow(0 20px 16px #00000025);
+  }
+  .vehicle-orbit {
+    position: absolute;
+    left: 15%;
+    top: 10%;
+    width: 65%;
+    height: 85%;
+    border: 1px solid #8ee8c51a;
+    border-radius: 50%;
+    transform: rotate(-20deg);
+  }
+  .vehicle-orbit-two {
+    left: 22%;
+    top: 2%;
+    width: 50%;
+    height: 100%;
+    transform: rotate(20deg);
+  }
+  .vehicle-label {
+    @apply absolute right-2 top-6 flex items-center gap-2 rounded-lg border border-emerald-200/20 bg-slate-950/60 px-3 py-2 text-[10px] text-emerald-100 backdrop-blur-sm;
+  }
+  .vehicle-caption {
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] tracking-[0.25em] text-slate-400;
+  }
+  .auth-steps {
+    @apply mt-10 grid grid-cols-3 gap-5 border-t border-white/10 pt-7;
+  }
+  .auth-steps > div {
+    @apply relative;
+  }
+  .auth-step-number {
+    @apply absolute right-2 top-0 text-[10px] text-slate-500;
+  }
+  .auth-access {
+    @apply relative flex min-h-screen flex-col justify-between px-5 py-6 sm:px-10 lg:px-12 lg:py-10 xl:px-16;
+    background: radial-gradient(ellipse at 100% 0%, #e1eee9, transparent 45%), #f5f7f8;
+  }
+  .auth-access-top {
+    @apply hidden items-center justify-between lg:flex;
+  }
+  .auth-form-area {
+    @apply mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center py-8 lg:py-12;
+  }
+  .auth-form-card {
+    @apply relative space-y-6 rounded-3xl border border-white bg-white p-7 sm:p-9;
+    box-shadow:
+      0 24px 65px -30px #163f4f40,
+      0 2px 8px #163f4f04;
+  }
+  .auth-form-mark {
+    @apply mb-2 flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-800;
+  }
+  .auth-form-card h1 {
+    @apply text-[28px] font-bold tracking-tight text-slate-900;
+  }
+  .auth-form-card form {
+    @apply space-y-5;
+  }
+  .auth-form-card input {
+    @apply h-12 rounded-xl bg-slate-50/70 px-4 transition-colors focus:bg-white;
+  }
+  .auth-form-card form > button {
+    @apply h-12 rounded-xl text-sm font-semibold;
+    box-shadow: 0 5px 14px #08725524;
+  }
+  .auth-form-card > a {
+    @apply inline-block text-xs no-underline hover:underline;
+  }
+  .auth-private-note {
+    @apply mt-6 flex items-center justify-center gap-2 text-center text-xs text-slate-500;
+  }
+  .auth-access-bottom {
+    @apply flex flex-wrap justify-between gap-3 text-[11px] font-medium text-slate-500;
+  }
+  .auth-access-bottom span {
+    @apply font-normal text-slate-400;
+  }
+  .portal-sidebar {
+    background: #0c202e;
+    border-color: #ffffff0d;
+  }
+  .portal-sidebar nav a {
+    @apply min-h-11 rounded-xl;
+  }
+  .portal-sidebar nav a[aria-current='page'] {
+    background: #97ebc91a;
+    color: #a1efce;
+    box-shadow: inset 3px 0 #97ebc9;
+  }
+  .portal-sidebar nav a:not([aria-current]) {
+    @apply text-slate-400 hover:bg-white/5 hover:text-white;
+  }
+  .portal-content {
+    background: radial-gradient(ellipse at 100% 0%, #e8f0ee, transparent 45%), #f4f7f9;
+  }
+  .portal-content h1 {
+    @apply tracking-tight text-slate-900;
+  }
+  .portal-content section > .rounded-xl,
+  .portal-content section > .rounded-lg {
+    @apply bg-white shadow-sm;
+  }
+  .portal-topbar {
+    @apply flex items-center justify-between gap-4 border-b border-slate-200/70 bg-white/80 px-6 py-4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

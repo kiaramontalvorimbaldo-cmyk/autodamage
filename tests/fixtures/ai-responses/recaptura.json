@@ -1,0 +1,21 @@
+{
+  "vehiculo": { "marca": "Chevrolet", "modelo": "Spark" },
+  "piezas_detectadas": [
+    {
+      "codigo_pieza": "FARO_DEL_DER",
+      "accion": "SUSTITUIR",
+      "confianza": 0.88,
+      "imagen_indice": 0,
+      "bbox": [130, 90, 270, 310]
+    }
+  ],
+  "nivel_severidad": "LEVE",
+  "indicadores_estructurales": {
+    "dano_estructural": false,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": true,
+  "motivo_recaptura": "Se observan patrones de moiré y bordes de pantalla típicos de una foto tomada a un monitor.",
+  "confianza_global": 0.88
+}

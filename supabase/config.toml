@@ -1,0 +1,33 @@
+[project]
+id = "autodamage-dev"
+name = "AutoDamage AI (dev)"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+enabled = true
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+
+[edge_runtime]
+enabled = false
+
+[auth]
+enable_signup = true
+enable_anonymous = false
+enable_email_signup = true
+email_confirmations = false
+min_password_length = 6
+
+[storage]
+enabled = true
+file_size_limit = 52428800
+
+[functions]
+enabled = false

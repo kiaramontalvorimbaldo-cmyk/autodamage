@@ -1,0 +1,28 @@
+{
+  "vehiculo": { "marca": "Honda", "modelo": "Civic" },
+  "piezas_detectadas": [
+    {
+      "codigo_pieza": "PUERTA_DEL_IZQ",
+      "accion": "REPARAR",
+      "confianza": 0.88,
+      "imagen_indice": 0,
+      "bbox": [100, 150, 500, 700]
+    },
+    {
+      "codigo_pieza": "GUARDABARRO_DEL_IZQ",
+      "accion": "PINTAR",
+      "confianza": 0.82,
+      "imagen_indice": 1,
+      "bbox": [200, 50, 400, 350]
+    }
+  ],
+  "nivel_severidad": "MODERADO",
+  "indicadores_estructurales": {
+    "dano_estructural": false,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": false,
+  "motivo_recaptura": null,
+  "confianza_global": 0.85
+}

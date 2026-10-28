@@ -1,0 +1,14 @@
+*                          @autodamage-ai/team
+/src/domain/               @autodamage-ai/backend
+/src/application/          @autodamage-ai/backend
+/src/infrastructure/       @autodamage-ai/backend
+/src/middleware.ts         @autodamage-ai/backend
+/supabase/                 @autodamage-ai/backend
+/scripts/                  @autodamage-ai/backend
+/src/app/                  @autodamage-ai/frontend
+/src/components/           @autodamage-ai/frontend
+/src/hooks/                @autodamage-ai/frontend
+/tests/                    @autodamage-ai/qa
+/docs/                     @autodamage-ai/pm
+/AGENTS.md                 @autodamage-ai/pm
+/ReadMe.md                 @autodamage-ai/pm

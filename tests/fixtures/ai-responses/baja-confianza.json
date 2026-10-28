@@ -1,0 +1,21 @@
+{
+  "vehiculo": { "marca": "Kia", "modelo": "Rio" },
+  "piezas_detectadas": [
+    {
+      "codigo_pieza": "ESPEJO_IZQ",
+      "accion": "REPARAR",
+      "confianza": 0.4,
+      "imagen_indice": 0,
+      "bbox": [300, 200, 400, 300]
+    }
+  ],
+  "nivel_severidad": "LEVE",
+  "indicadores_estructurales": {
+    "dano_estructural": false,
+    "airbags": false,
+    "perdida_total": false
+  },
+  "sospecha_recaptura": false,
+  "motivo_recaptura": null,
+  "confianza_global": 0.45
+}

@@ -6,11 +6,15 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['junit', { outputFile: 'junit-results/playwright.xml', includeProjectInTestName: true }],
+  ],
   use: {
-    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
+    baseURL: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3000',
     trace: 'on-first-retry',
-    channel: process.env.PLAYWRIGHT_CHANNEL as 'chrome' | undefined,
+    channel: (process.env.PLAYWRIGHT_CHANNEL || undefined) as 'chrome' | undefined,
   },
   projects: [
     {
@@ -32,8 +36,10 @@ export default defineConfig({
   webServer: process.env.E2E_EXTERNAL_SERVER
     ? undefined
     : {
-        command: 'npm run dev',
-        url: 'http://localhost:3000',
+        command: process.env.CI
+          ? 'npm run start -- --hostname 127.0.0.1 --port 3000'
+          : 'npm run dev -- --hostname 127.0.0.1 --port 3000',
+        url: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3000',
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },

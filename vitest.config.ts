@@ -11,6 +11,8 @@ export default defineConfig({
     jsx: 'automatic',
   },
   test: {
+    reporters: ['default', 'junit'],
+    outputFile: { junit: 'junit-results/vitest.xml' },
     environment: 'node',
     environmentMatchGlobs: [
       ['src/components/**', 'jsdom'],
@@ -33,6 +35,7 @@ export default defineConfig({
     exclude: ['node_modules/**', '.next/**', 'tests/e2e/**'],
     coverage: {
       provider: 'v8',
+      reportsDirectory: 'coverage',
       reporter: ['text', 'json-summary', 'html'],
       include: ['src/domain/**', 'src/lib/**', 'src/application/**'],
       thresholds: {

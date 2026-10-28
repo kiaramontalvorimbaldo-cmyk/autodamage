@@ -369,6 +369,10 @@ DAILY_AI_QUOTA_LIMIT=200        # tope interno para no agotar la cuota
 
 ---
 
+## Jenkins y reportes de pruebas
+
+El proyecto incluye un `Jenkinsfile`, reportes JUnit XML y publicación de cobertura y pruebas de navegador en HTML. Consulta [la configuración y los requisitos de Jenkins](docs/jenkins.md) antes de ejecutar el trabajo conectado a GitHub.
+
 ## 12. Supuestos por confirmar con el equipo
 
 1. Dedicación semanal real de cada integrante (el plan asume que se puede sostener el ritmo de 10 semanas).

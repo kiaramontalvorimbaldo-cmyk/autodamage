@@ -14,6 +14,7 @@ const eslintConfig = tseslint.config(
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
+      'junit-results/**',
       'public/mediapipe/**',
       'public/icons/**',
       'next-env.d.ts',
@@ -122,4 +123,3 @@ const eslintConfig = tseslint.config(
 );
 
 export default eslintConfig;
-

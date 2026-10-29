@@ -18,11 +18,12 @@ const actions = {
     '--testTimeout=20000',
   ],
   build: ['node_modules/next/dist/bin/next', 'build'],
-  browsers: ['node_modules/@playwright/test/cli.js', 'install', 'chromium'],
+  browsers: ['node_modules/@playwright/test/cli.js', 'install', '--only-shell', 'chromium'],
   'browsers-with-deps': [
     'node_modules/@playwright/test/cli.js',
     'install',
     '--with-deps',
+    '--only-shell',
     'chromium',
   ],
   e2e: ['node_modules/@playwright/test/cli.js', 'test', ...publicE2eFiles],

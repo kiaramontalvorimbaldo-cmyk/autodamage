@@ -20,6 +20,10 @@ Las pruebas de CI usan Gemini simulado y valores ficticios de Supabase, sin nece
 
 ## Resultados publicados
 
+La instalación descarga únicamente Chromium Headless Shell, suficiente para las pruebas sin ventana de este pipeline. El tiempo máximo sin recibir datos aumenta de 30 a 120 segundos; se puede ajustar con `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT` en el agente. Playwright reutiliza su caché entre ejecuciones y conserva la configuración de proxy del agente. Si la red bloquea el CDN, hay que configurar el proxy o un espejo autorizado según la [documentación de Playwright](https://playwright.dev/docs/browsers#install-behind-a-firewall-or-a-proxy); aumentar el tiempo no elimina un bloqueo de red.
+
+Si falla la descarga, la ejecución queda fallida y omite las pruebas que necesitan el navegador, pero publica el XML de Vitest y la cobertura disponibles. El pipeline usa accesos directos a las variables de Jenkins para evitar la firma `getAt` rechazada por su protección de scripts; no requiere aprobar esa firma ni desactivar la protección.
+
 | Resultado                 | Archivo                        |
 | ------------------------- | ------------------------------ |
 | JUnit de Vitest           | `junit-results/vitest.xml`     |
@@ -46,3 +50,7 @@ npm run test:e2e:ci
 Playwright inicia la aplicación compilada en el puerto 3000; debe estar libre. No se ejecutó el trabajo en tu servidor Jenkins: la comprobación local valida los comandos y archivos generados, no los plugins o permisos de ese servidor.
 
 Referencias oficiales: [JUnit](https://www.jenkins.io/doc/pipeline/steps/junit/), [HTML Publisher](https://www.jenkins.io/doc/pipeline/steps/htmlpublisher/), [seguridad de reportes HTML](https://www.jenkins.io/doc/book/security/configuring-content-security-policy/), [Playwright en CI](https://playwright.dev/docs/ci).
+
+## Comprobación de las correcciones (28 de octubre de 2026)
+
+Lint y tipos aprobados; 649 pruebas Vitest aprobadas y 3 remotas omitidas; cobertura 92,13 %. Instalación de Headless Shell comprobada reutilizando la caché local. Las 24 pruebas públicas Playwright pasaron y generaron XML y HTML contra una compilación local con servidor iniciado por separado. El cierre automático del servidor de Playwright se bloqueó en este entorno Windows de verificación; esta comprobación no valida ese cierre en Jenkins. La publicación y la descarga en la red del agente quedan por confirmar al subir los cambios y ejecutar el trabajo real.

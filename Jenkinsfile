@@ -46,6 +46,7 @@ pipeline {
                     env.UNIT_STARTED = 'false'
                     env.E2E_STARTED = 'false'
                     env.APP_BUILD_OK = 'false'
+                    env.BROWSER_READY = 'false'
                 }
                 checkout scm
                 script {
@@ -103,14 +104,17 @@ pipeline {
             when { expression { env.APP_BUILD_OK == 'true' } }
             steps {
                 script {
-                    projectCommand(isUnix() && params.INSTALL_BROWSER_SYSTEM_DEPS
-                        ? 'node scripts/ci/run.mjs browsers-with-deps'
-                        : 'node scripts/ci/run.mjs browsers')
+                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                        projectCommand(isUnix() && params.INSTALL_BROWSER_SYSTEM_DEPS
+                            ? 'node scripts/ci/run.mjs browsers-with-deps'
+                            : 'node scripts/ci/run.mjs browsers')
+                        env.BROWSER_READY = 'true'
+                    }
                 }
             }
         }
         stage('Pruebas de navegador') {
-            when { expression { env.APP_BUILD_OK == 'true' } }
+            when { expression { env.APP_BUILD_OK == 'true' && env.BROWSER_READY == 'true' } }
             steps {
                 script {
                     env.E2E_STARTED = 'true'
@@ -127,11 +131,15 @@ pipeline {
                 if (env.REPORTS_READY == 'true') {
                     inProject {
                         // Una publicación fallida no impide archivar los demás resultados.
-                        ['UNIT_STARTED': 'junit-results/vitest.xml', 'E2E_STARTED': 'junit-results/playwright.xml'].each { flag, report ->
-                            if (env[flag] == 'true') {
-                                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
-                                    junit(testResults: report, allowEmptyResults: false)
-                                }
+                        // Acceso directo: env[flag] requiere una firma bloqueada por Jenkins.
+                        if (env.UNIT_STARTED == 'true') {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                junit(testResults: 'junit-results/vitest.xml', allowEmptyResults: false)
+                            }
+                        }
+                        if (env.E2E_STARTED == 'true') {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                junit(testResults: 'junit-results/playwright.xml', allowEmptyResults: false)
                             }
                         }
                         ['Cobertura Vitest': 'coverage', 'Pruebas de navegador': 'playwright-report'].each { title, folder ->

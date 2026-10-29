@@ -2,6 +2,21 @@ import { describe, it, expect } from 'vitest';
 import { ciEnvironment, publicE2eFiles } from '../scripts/ci/environment.mjs';
 
 describe('aislamiento de la verificación de Jenkins', () => {
+  it('regresion-descarga-chromium: debería ampliar el tiempo sin datos y conservar proxy y caché', () => {
+    const env = ciEnvironment({
+      HTTPS_PROXY: 'http://proxy.example:8080',
+      PLAYWRIGHT_BROWSERS_PATH: '/cache',
+    });
+    expect(env.PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT).toBe('120000');
+    expect(env.HTTPS_PROXY).toBe('http://proxy.example:8080');
+    expect(env.PLAYWRIGHT_BROWSERS_PATH).toBe('/cache');
+  });
+  it('debería permitir un tiempo de descarga configurado por el agente', () => {
+    expect(
+      ciEnvironment({ PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '180000' })
+        .PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT,
+    ).toBe('180000');
+  });
   it('debería reemplazar credenciales y destinos heredados por simulaciones locales', () => {
     const base = {
       AI_PROVIDER: 'gemini',

@@ -35,6 +35,7 @@ export function ciEnvironment(base = process.env) {
     E2E_BASE_URL: 'http://127.0.0.1:3000',
     PLAYWRIGHT_CHANNEL: '',
     PLAYWRIGHT_HTML_OPEN: 'never',
+    PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: base.PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT || '120000',
     DAILY_AI_QUOTA_LIMIT: '200',
     AI_MAX_RPM: '10',
     AUTODAMAGE_BUILD_DIR: '.next-ci',

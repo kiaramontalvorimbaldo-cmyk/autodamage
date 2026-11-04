@@ -14,6 +14,10 @@ Después de subir los cambios, usa «Construir ahora» o el disparador de GitHub
 
 ## Qué ejecuta
 
+Para reducir bloqueos de carga de módulos en agentes Windows, `test:ci` usa procesos separados (`forks`) con un solo trabajador y sin archivos ejecutándose en paralelo. Mantiene el aislamiento entre archivos y todas las pruebas; no reintenta ni oculta fallos. La cobertura disponible también se genera cuando falla una suite, conservando el resultado fallido y los umbrales existentes.
+
+Comprobación local de este ajuste: 654 pruebas aprobadas, 3 remotas omitidas, cobertura 92,13 %, XML y HTML generados; lint y tipos aprobados. La ejecución completa tardó 143 segundos. Los seis casos de `analysis-reservation.test.ts`, cuya carga agotó el tiempo en Jenkins, pasaron. Se debe confirmar la estabilidad al ejecutar esta versión en el agente real. Referencia: [paralelismo en Vitest 3](https://v3.vitest.dev/guide/parallelism).
+
 El pipeline tiene seis etapas: checkout y preparación, instalación con `npm ci`, calidad del código, verificación de tipos, pruebas unitarias e integración con cobertura y compilación. No instala Chromium ni ejecuta pruebas de navegador. Configura `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` durante la ejecución.
 
 Las pruebas de CI usan Gemini simulado y valores ficticios de Supabase, sin necesitar secretos. Se conserva toda la suite Vitest de dominio, casos de uso, componentes, servicios, seguridad e integración local, incluidos sus umbrales de cobertura. El build `.next-ci` es exclusivamente para verificar la aplicación; para producción hay que compilar con la configuración real. Las tres pruebas RLS remotas necesitan un entorno separado y permanecen omitidas sin sus credenciales; no se cuentan como aprobadas.

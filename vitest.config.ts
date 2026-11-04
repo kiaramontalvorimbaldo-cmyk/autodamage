@@ -35,6 +35,7 @@ export default defineConfig({
     exclude: ['node_modules/**', '.next/**', 'tests/e2e/**'],
     coverage: {
       provider: 'v8',
+      reportOnFailure: true,
       reportsDirectory: 'coverage',
       reporter: ['text', 'json-summary', 'html'],
       include: ['src/domain/**', 'src/lib/**', 'src/application/**'],

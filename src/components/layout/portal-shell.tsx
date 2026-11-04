@@ -35,6 +35,7 @@ const ITEMS_POR_ROL: Record<Rol, ItemNav[]> = {
     { href: '/admin/casos', etiqueta: 'Casos', icono: FileText },
     { href: '/admin/personal', etiqueta: 'Personal', icono: ClipboardList },
     { href: '/admin/auditoria', etiqueta: 'Auditoría', icono: FileText },
+    { href: '/admin/reportes', etiqueta: 'Reportes', icono: FileText },
   ],
 };
 

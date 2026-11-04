@@ -205,3 +205,54 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+  body:has(.insurance-report) {
+    background: white !important;
+    color: #0f172a;
+  }
+  body:has(.insurance-report) aside,
+  body:has(.insurance-report) nav,
+  body:has(.insurance-report) .portal-topbar,
+  body:has(.insurance-report) .report-tools,
+  body:has(.insurance-report) header.sticky {
+    display: none !important;
+  }
+  body:has(.insurance-report) .portal-content,
+  body:has(.insurance-report) .portal-content > div {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  .insurance-report {
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    font-size: 10pt;
+  }
+  .insurance-report h2 {
+    break-after: avoid;
+  }
+  .insurance-report .report-photo,
+  .insurance-report tr,
+  .insurance-report .report-event {
+    break-inside: avoid;
+  }
+  .insurance-report thead {
+    display: table-header-group;
+  }
+  .insurance-report .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .insurance-report * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .insurance-report .overflow-x-auto {
+    overflow: visible;
+  }
+}

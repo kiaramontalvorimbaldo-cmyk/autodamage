@@ -40,6 +40,12 @@ export default function AdminPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {[
             {
+              href: '/admin/reportes',
+              titulo: 'Reportes',
+              descripcion: 'Informes técnicos de siniestros para imprimir o guardar en PDF.',
+              icon: Files,
+            },
+            {
               href: '/admin/casos',
               titulo: 'Casos',
               descripcion: 'El panorama de los siniestros y su atención.',

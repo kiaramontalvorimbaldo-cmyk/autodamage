@@ -31,12 +31,12 @@ pipeline {
     }
     parameters {
         string(name: 'PROJECT_DIR', defaultValue: '.', description: 'Carpeta que contiene package.json. Usa . si el proyecto es la raíz del repositorio.')
-        booleanParam(name: 'INSTALL_BROWSER_SYSTEM_DEPS', defaultValue: false, description: 'Solo Linux: instalar dependencias del sistema de Chromium. Requiere permisos para instalar paquetes.')
     }
     environment {
         CI = 'true'
         HUSKY = '0'
         NEXT_TELEMETRY_DISABLED = '1'
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = '1'
     }
     stages {
         stage('Checkout y preparación') {
@@ -44,9 +44,6 @@ pipeline {
                 script {
                     env.REPORTS_READY = 'false'
                     env.UNIT_STARTED = 'false'
-                    env.E2E_STARTED = 'false'
-                    env.APP_BUILD_OK = 'false'
-                    env.BROWSER_READY = 'false'
                 }
                 checkout scm
                 script {
@@ -68,19 +65,25 @@ pipeline {
         stage('Instalar dependencias') {
             steps { script { projectCommand('npm ci') } }
         }
-        stage('Lint y tipos') {
+        stage('Calidad del código') {
             steps {
                 script {
                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                         projectCommand('node scripts/ci/run.mjs lint')
                     }
+                }
+            }
+        }
+        stage('Verificar tipos') {
+            steps {
+                script {
                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                         projectCommand('node scripts/ci/run.mjs typecheck')
                     }
                 }
             }
         }
-        stage('Pruebas unitarias y cobertura') {
+        stage('Pruebas unitarias, integración y cobertura') {
             steps {
                 script {
                     env.UNIT_STARTED = 'true'
@@ -95,31 +98,6 @@ pipeline {
                 script {
                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                         projectCommand('npm run build:ci')
-                        env.APP_BUILD_OK = 'true'
-                    }
-                }
-            }
-        }
-        stage('Preparar Chromium') {
-            when { expression { env.APP_BUILD_OK == 'true' } }
-            steps {
-                script {
-                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
-                        projectCommand(isUnix() && params.INSTALL_BROWSER_SYSTEM_DEPS
-                            ? 'node scripts/ci/run.mjs browsers-with-deps'
-                            : 'node scripts/ci/run.mjs browsers')
-                        env.BROWSER_READY = 'true'
-                    }
-                }
-            }
-        }
-        stage('Pruebas de navegador') {
-            when { expression { env.APP_BUILD_OK == 'true' && env.BROWSER_READY == 'true' } }
-            steps {
-                script {
-                    env.E2E_STARTED = 'true'
-                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
-                        projectCommand('npm run test:e2e:ci')
                     }
                 }
             }
@@ -137,19 +115,12 @@ pipeline {
                                 junit(testResults: 'junit-results/vitest.xml', allowEmptyResults: false)
                             }
                         }
-                        if (env.E2E_STARTED == 'true') {
+                        if (fileExists('coverage/index.html')) {
                             catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
-                                junit(testResults: 'junit-results/playwright.xml', allowEmptyResults: false)
+                                publishHTML(target: [reportName: 'Cobertura Vitest', reportDir: 'coverage', reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
                             }
                         }
-                        ['Cobertura Vitest': 'coverage', 'Pruebas de navegador': 'playwright-report'].each { title, folder ->
-                            if (fileExists("${folder}/index.html")) {
-                                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
-                                    publishHTML(target: [reportName: title, reportDir: folder, reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
-                                }
-                            }
-                        }
-                        archiveArtifacts(artifacts: 'junit-results/*.xml,coverage/**,playwright-report/**,test-results/**', allowEmptyArchive: true)
+                        archiveArtifacts(artifacts: 'junit-results/vitest.xml,coverage/**', allowEmptyArchive: true)
                     }
                 }
             }

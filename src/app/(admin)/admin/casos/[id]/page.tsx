@@ -39,6 +39,12 @@ export default async function CasoAdmin({ params }: { params: Promise<{ id: stri
         ← Casos
       </Link>
       <h1 className="text-2xl font-semibold">Siniestro {id.slice(0, 8)}</h1>
+      <Link
+        href={`/admin/reportes/${id}`}
+        className="inline-block rounded-lg bg-primary px-4 py-2 text-white"
+      >
+        Informe del siniestro / PDF
+      </Link>
       <p>
         {detalle.siniestro?.estado} · {detalle.taller?.nombre ?? 'Sin taller asignado'}
       </p>

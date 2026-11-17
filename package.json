@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --configLoader runner --coverage",
     "test:e2e": "playwright test",
     "test:ci": "node scripts/ci/run.mjs unit",
+    "test:serenity": "node scripts/ci/serenity.mjs",
     "test:e2e:ci": "node scripts/ci/run.mjs e2e",
     "build:ci": "node scripts/ci/run.mjs build",
     "format": "prettier --write .",

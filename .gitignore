@@ -36,6 +36,8 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /junit-results/
+/serenity-tests/target/
+/serenity-tests/*.log
 
 .next-followup/
 .next-*/

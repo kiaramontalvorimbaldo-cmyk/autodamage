@@ -15,6 +15,7 @@ const eslintConfig = tseslint.config(
       'playwright-report/**',
       'test-results/**',
       'junit-results/**',
+      'serenity-tests/target/**',
       'public/mediapipe/**',
       'public/icons/**',
       'next-env.d.ts',

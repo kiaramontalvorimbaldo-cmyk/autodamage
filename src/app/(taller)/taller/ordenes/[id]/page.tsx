@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 import { ErrorState } from '@/components/ErrorState';
+import { CaseCoordination } from '@/components/claim/case-coordination';
 import { LoadingState } from '@/components/LoadingState';
 import { apiFetch, ApiError } from '@/lib/api-client';
 import { formatCurrencyUsd } from '@/lib/format';
@@ -116,6 +117,13 @@ export default function DetalleOrdenPage({ params }: { params: Promise<{ id: str
           </li>
         ))}
       </ul>
+
+      <CaseCoordination
+        key={detalle.orden.siniestroId}
+        siniestroId={detalle.orden.siniestroId}
+        rol="TALLER"
+        completado={detalle.orden.estado === 'COMPLETADO'}
+      />
 
       {siguiente && !confirmando && (
         <button

@@ -87,11 +87,14 @@ export async function analyzeClaim(
 
     const ahora = deps.reloj.ahora();
     const env = getEnv();
-    const mapaBaremo = await deps.baremo.obtenerTodo();
+    const [mapaBaremo, inspeccionesHoy, hashesOtrosSiniestros] = await Promise.all([
+      deps.baremo.obtenerTodo(),
+      deps.repositorio.contarInspeccionesDigitalIaHoy(ahora),
+      deps.repositorio.listarHashesDeOtrosSiniestros(siniestroId),
+    ]);
 
     // (1) Cuota diaria y límite por minuto
     let iaDisponible = true;
-    const inspeccionesHoy = await deps.repositorio.contarInspeccionesDigitalIaHoy(ahora);
     if (inspeccionesHoy >= env.DAILY_AI_QUOTA_LIMIT) {
       iaDisponible = false;
     }
@@ -125,7 +128,6 @@ export async function analyzeClaim(
     }
 
     let fotoDuplicada = false;
-    const hashesOtrosSiniestros = await deps.repositorio.listarHashesDeOtrosSiniestros(siniestroId);
     for (const imagen of imagenes) {
       for (const hashOtro of hashesOtrosSiniestros) {
         if (hammingDistanceHex(imagen.hashPerceptual, hashOtro) <= HAMMING_MAX_DUPLICADO) {
@@ -140,13 +142,15 @@ export async function analyzeClaim(
     let analisis: AnalisisIA | null = null;
     if (iaDisponible) {
       try {
-        const imagenesBase64 = await Promise.all(
-          imagenes.map(async (imagen) => {
-            const contenido = await deps.almacen.descargar(imagen.storagePath);
-            return { base64: contenido.toString('base64'), mimeType: 'image/jpeg' as const };
-          }),
-        );
-        const vehiculo = await deps.repositorio.obtenerVehiculoPorId(siniestro.vehiculoId);
+        const [imagenesBase64, vehiculo] = await Promise.all([
+          Promise.all(
+            imagenes.map(async (imagen) => {
+              const contenido = await deps.almacen.descargar(imagen.storagePath);
+              return { base64: contenido.toString('base64'), mimeType: 'image/jpeg' as const };
+            }),
+          ),
+          deps.repositorio.obtenerVehiculoPorId(siniestro.vehiculoId),
+        ]);
         analisis = await deps.proveedorIa.analizarDanos({
           imagenes: imagenesBase64,
           codigosPiezasValidos: [...mapaBaremo.keys()],

@@ -12,6 +12,7 @@ import { RouteBadge } from '@/components/RouteBadge';
 import { EvidenceImage } from '@/components/evidence-image';
 import { AnalysisBasis } from '@/components/analysis-basis';
 import { AnalysisProvenance } from '@/components/analysis-provenance';
+import { CaseCoordination } from '@/components/claim/case-coordination';
 import { admiteDictamen } from '@/domain/claim-state/review-flow';
 import Link from 'next/link';
 import { ErrorState } from '@/components/ErrorState';
@@ -293,6 +294,8 @@ export default function DetallePeritoPage({ params }: { params: Promise<{ id: st
         <h2 className="text-sm font-semibold">Historial de auditoría</h2>
         <AuditoriaLista id={id} />
       </section>
+
+      {detalle.orden && <CaseCoordination key={id} siniestroId={id} rol="PERITO" />}
 
       {imagenPrincipal && (
         <section className="space-y-3" aria-label="Evidencias del siniestro">

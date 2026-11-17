@@ -1,7 +1,7 @@
 import { AppError } from '@/lib/errors';
 import { EXPIRACION_URL_FIRMADA_SEG } from '@/domain/config';
 import type { ClaimRepository } from '@/application/ports/claim-repository';
-import type { StorageService } from '@/application/ports/storage-service';
+import { firmarEvidencias, type StorageService } from '@/application/ports/storage-service';
 import type { WorkOrderRepository } from '@/application/ports/work-order-repository';
 import type { Orden, Taller } from '@/domain/entities';
 import type { Rol } from '@/domain/types';
@@ -46,24 +46,37 @@ export async function getClaim(
     throw new AppError('SINIESTRO_AJENO', 403, 'No tienes acceso a este siniestro');
   }
 
-  const imagenes = await deps.repositorio.listarImagenes(siniestroId);
-  const imagenesConUrl = await Promise.all(
-    imagenes.map(async (imagen) => ({
-      id: imagen.id,
-      orden: imagen.orden,
-      capturadaEn: imagen.capturadaEn,
-      latitud: imagen.latitud,
-      longitud: imagen.longitud,
-      url: await deps.almacen.urlFirmado(imagen.storagePath, EXPIRACION_URL_FIRMADA_SEG),
+  const repositorio = deps.repositorio;
+  const ordenes = deps.ordenes;
+  const [imagenesConUrl, { inspeccion, evaluaciones }, { orden, taller }] = await Promise.all([
+    repositorio.listarImagenes(siniestroId).then(async (imagenes) => {
+      const urls = await firmarEvidencias(
+        deps.almacen,
+        imagenes.map((imagen) => imagen.storagePath),
+        EXPIRACION_URL_FIRMADA_SEG,
+      );
+      return imagenes.map(({ id, orden, capturadaEn, latitud, longitud }, i) => ({
+        id,
+        orden,
+        capturadaEn,
+        latitud,
+        longitud,
+        url: urls[i],
+      }));
+    }),
+    repositorio.obtenerInspeccionPorSiniestro(siniestroId).then(async (inspeccion) => ({
+      inspeccion,
+      evaluaciones: inspeccion
+        ? await repositorio.listarEvaluacionesPorInspeccion(inspeccion.id)
+        : [],
     })),
-  );
-
-  const inspeccion = await deps.repositorio.obtenerInspeccionPorSiniestro(siniestroId);
-  const evaluaciones = inspeccion
-    ? await deps.repositorio.listarEvaluacionesPorInspeccion(inspeccion.id)
-    : [];
-  const orden = deps.ordenes ? await deps.ordenes.obtenerOrdenPorSiniestro(siniestroId) : null;
-  const taller = orden && deps.ordenes ? await deps.ordenes.obtenerTallerPorId(orden.tallerId) : null;
+    ordenes
+      ? ordenes.obtenerOrdenPorSiniestro(siniestroId).then(async (orden) => ({
+          orden,
+          taller: orden ? await ordenes.obtenerTallerPorId(orden.tallerId) : null,
+        }))
+      : { orden: null, taller: null },
+  ]);
 
   return { siniestro, imagenes: imagenesConUrl, inspeccion, evaluaciones, orden, taller };
 }

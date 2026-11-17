@@ -9,4 +9,13 @@ export interface StorageService {
   eliminar(camino: string): Promise<void>;
   /** URL firmada con expiración (segundos). */
   urlFirmado(camino: string, expiracionSegundos: number): Promise<string>;
+  urlFirmados?(caminos: string[], expiracionSegundos: number): Promise<string[]>;
+}
+
+/** Devuelve las URLs en el mismo orden que las rutas solicitadas. */
+export function firmarEvidencias(almacen: StorageService, caminos: string[], expiracion: number) {
+  if (caminos.length === 0) return Promise.resolve([]);
+  return almacen.urlFirmados
+    ? almacen.urlFirmados(caminos, expiracion)
+    : Promise.all(caminos.map((camino) => almacen.urlFirmado(camino, expiracion)));
 }

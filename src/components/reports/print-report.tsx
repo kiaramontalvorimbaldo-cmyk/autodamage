@@ -25,7 +25,7 @@ export function PrintReport() {
         onClick={() => void imprimir()}
         className="rounded-xl bg-primary px-5 py-3 font-semibold text-white"
       >
-        Imprimir / Guardar PDF
+        Imprimir
       </button>
       <p className="text-sm text-muted-foreground">
         En el diálogo de impresión selecciona «Guardar como PDF», papel A4 y desactiva los

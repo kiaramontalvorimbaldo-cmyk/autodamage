@@ -1,5 +1,19 @@
 import { getAdminClient } from '@/infrastructure/supabase/admin-client';
 
+function consultarCasos(db: ReturnType<typeof getAdminClient>) {
+  return db
+    .from('siniestros')
+    .select('id,estado,ruta,fecha_incidente,descripcion')
+    .order('fecha_incidente', { ascending: false })
+    .limit(100);
+}
+
+export async function consultarCasosParaReportes() {
+  const { data, error } = await consultarCasos(getAdminClient());
+  if (error) throw new Error('No se pudo consultar la administración');
+  return data ?? [];
+}
+
 /** Consultas limitadas para el panel; la autorización se realiza antes de invocarlas. */
 export async function consultarAdministracion() {
   const db = getAdminClient();
@@ -7,11 +21,7 @@ export async function consultarAdministracion() {
     db.from('usuarios').select('id,nombre_completo,email,rol').order('nombre_completo').limit(200),
     db.from('peritos').select('usuario_id,estado').limit(200),
     db.from('talleres').select('id,usuario_id,nombre,activo').limit(200),
-    db
-      .from('siniestros')
-      .select('id,estado,ruta,fecha_incidente,descripcion')
-      .order('fecha_incidente', { ascending: false })
-      .limit(100),
+    consultarCasos(db),
     db.from('ordenes_trabajo').select('siniestro_id,taller_id,estado').limit(200),
     db
       .from('audit_log')

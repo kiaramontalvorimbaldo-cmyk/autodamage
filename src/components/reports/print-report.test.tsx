@@ -12,13 +12,13 @@ it('debería impedir imprimir un expediente con una evidencia que no cargó', as
       <PrintReport />
     </>,
   );
-  fireEvent.click(screen.getByRole('button', { name: /Guardar PDF/ }));
+  fireEvent.click(screen.getByRole('button', { name: 'Imprimir' }));
   await waitFor(() =>
     expect(screen.getByRole('alert')).toHaveTextContent('Hay evidencias que no cargaron'),
   );
   expect(imprimir).not.toHaveBeenCalled();
 });
-it('debería permitir guardar como PDF un expediente pendiente sin fotografías', async () => {
+it('debería permitir imprimir un expediente pendiente sin fotografías', async () => {
   const imprimir = vi.spyOn(window, 'print').mockImplementation(() => {});
   render(
     <>
@@ -26,6 +26,6 @@ it('debería permitir guardar como PDF un expediente pendiente sin fotografías'
       <PrintReport />
     </>,
   );
-  fireEvent.click(screen.getByRole('button', { name: /Guardar PDF/ }));
+  fireEvent.click(screen.getByRole('button', { name: 'Imprimir' }));
   await waitFor(() => expect(imprimir).toHaveBeenCalledOnce());
 });

@@ -42,13 +42,13 @@ export default function AdminPage() {
             {
               href: '/admin/reportes',
               titulo: 'Reportes',
-              descripcion: 'Informes técnicos de siniestros para imprimir o guardar en PDF.',
+              descripcion: 'Incidentes por fecha, estado y ruta de atención.',
               icon: Files,
             },
             {
               href: '/admin/casos',
               titulo: 'Casos',
-              descripcion: 'El panorama de los siniestros y su atención.',
+              descripcion: 'Expedientes, evidencias e informes para imprimir.',
               icon: Files,
             },
             {

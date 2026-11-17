@@ -1,6 +1,6 @@
 /**
  * Prompt v1.1 para el análisis de daños con Gemini.
- * Historial en docs/prompts/v1.md y docs/prompts/v1.1.md.
+ * Las revisiones anteriores del prompt se conservan en el historial de Git.
  */
 export const VERSION_PROMPT = 'v1.2';
 

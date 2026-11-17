@@ -7,3 +7,4 @@ dist
 public/icons
 public/mediapipe
 package-lock.json
+serenity-tests/target

@@ -31,6 +31,8 @@ pipeline {
     }
     parameters {
         string(name: 'PROJECT_DIR', defaultValue: '.', description: 'Carpeta que contiene package.json. Usa . si el proyecto es la raíz del repositorio.')
+        string(name: 'SERENITY_JDK_TOOL', defaultValue: 'Java 25', description: 'Nombre del JDK configurado en Administrar Jenkins > Tools (Java 17 o superior).')
+        string(name: 'SERENITY_MAVEN_TOOL', defaultValue: 'Maven 3.8.6', description: 'Nombre de Maven configurado en Administrar Jenkins > Tools.')
     }
     environment {
         CI = 'true'
@@ -44,6 +46,8 @@ pipeline {
                 script {
                     env.REPORTS_READY = 'false'
                     env.UNIT_STARTED = 'false'
+                    env.APP_BUILD_OK = 'false'
+                    env.SERENITY_STARTED = 'false'
                 }
                 checkout scm
                 script {
@@ -52,7 +56,7 @@ pipeline {
                             error('PROJECT_DIR no contiene el proyecto Node.js. Revisa la carpeta configurada.')
                         }
                         // Solo salidas generadas: evita publicar resultados de un build anterior.
-                        ['coverage', 'playwright-report', 'junit-results', 'test-results'].each { folder ->
+                        ['coverage', 'playwright-report', 'junit-results', 'test-results', 'serenity-tests/target'].each { folder ->
                             dir(folder) { deleteDir() }
                         }
                         env.REPORTS_READY = 'true'
@@ -98,6 +102,22 @@ pipeline {
                 script {
                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                         projectCommand('npm run build:ci')
+                        env.APP_BUILD_OK = 'true'
+                    }
+                }
+            }
+        }
+        stage('Pruebas Serenity de API') {
+            when { expression { env.APP_BUILD_OK == 'true' } }
+            steps {
+                script {
+                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                        def javaHome = tool(name: params.SERENITY_JDK_TOOL, type: 'hudson.model.JDK')
+                        def mavenHome = tool(name: params.SERENITY_MAVEN_TOOL, type: 'hudson.tasks.Maven$MavenInstallation')
+                        withEnv(["JAVA_HOME=${javaHome}", "MAVEN_HOME=${mavenHome}"]) {
+                            env.SERENITY_STARTED = 'true'
+                            projectCommand('npm run test:serenity')
+                        }
                     }
                 }
             }
@@ -115,12 +135,22 @@ pipeline {
                                 junit(testResults: 'junit-results/vitest.xml', allowEmptyResults: false)
                             }
                         }
+                        if (env.SERENITY_STARTED == 'true') {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                junit(testResults: 'serenity-tests/target/failsafe-reports/TEST-*.xml', allowEmptyResults: false)
+                            }
+                        }
                         if (fileExists('coverage/index.html')) {
                             catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                                 publishHTML(target: [reportName: 'Cobertura Vitest', reportDir: 'coverage', reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
                             }
                         }
-                        archiveArtifacts(artifacts: 'junit-results/vitest.xml,coverage/**', allowEmptyArchive: true)
+                        if (fileExists('serenity-tests/target/site/serenity/index.html')) {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                publishHTML(target: [reportName: 'Serenity API Report', reportDir: 'serenity-tests/target/site/serenity', reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
+                            }
+                        }
+                        archiveArtifacts(artifacts: 'junit-results/vitest.xml,coverage/**,serenity-tests/target/failsafe-reports/**,serenity-tests/target/site/serenity/**,serenity-tests/target/cucumber-results.json', allowEmptyArchive: true)
                     }
                 }
             }

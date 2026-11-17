@@ -54,3 +54,43 @@ describe('almacenamiento de evidencias', () => {
     ).rejects.toMatchObject({ code: 'STORAGE_ERROR', details: undefined });
   });
 });
+
+describe('firma de evidencias en lote', () => {
+  const endpoint = 'https://supabase.test/storage/v1/object/sign/evidencias';
+
+  it('firma rutas únicas en una solicitud y conserva el orden original', async () => {
+    let llamadas = 0;
+    server.use(
+      http.post(endpoint, async ({ request }) => {
+        llamadas += 1;
+        expect(await request.json()).toEqual({ paths: ['a.jpg', 'b.jpg'], expiresIn: 3600 });
+        return HttpResponse.json([
+          { path: 'b.jpg', signedURL: '/object/sign/evidencias/b.jpg?token=b', error: null },
+          { path: 'a.jpg', signedURL: '/object/sign/evidencias/a.jpg?token=a', error: null },
+        ]);
+      }),
+    );
+    await expect(
+      new SupabaseStorageService().urlFirmados(['a.jpg', 'b.jpg', 'a.jpg'], 3600),
+    ).resolves.toEqual([
+      endpoint + '/a.jpg?token=a',
+      endpoint + '/b.jpg?token=b',
+      endpoint + '/a.jpg?token=a',
+    ]);
+    expect(llamadas).toBe(1);
+  });
+
+  it('rechaza el lote cuando falta una firma', async () => {
+    server.use(
+      http.post(endpoint, () =>
+        HttpResponse.json([
+          { path: 'a.jpg', signedURL: '/object/sign/evidencias/a.jpg?token=a', error: null },
+          { path: 'b.jpg', signedURL: null, error: 'Object not found' },
+        ]),
+      ),
+    );
+    await expect(
+      new SupabaseStorageService().urlFirmados(['a.jpg', 'b.jpg'], 3600),
+    ).rejects.toMatchObject({ code: 'STORAGE_ERROR' });
+  });
+});

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AppError, toErrorResponse } from '@/lib/errors';
 import { requerirSesion } from '@/lib/session';
 import { getClaimRepository, getStorageService, getWorkOrderRepository } from '@/composition';
+import { firmarEvidencias } from '@/application/ports/storage-service';
 import { EXPIRACION_URL_FIRMADA_SEG } from '@/domain/config';
 
 /** Detalle de una orden: vehículo, piezas aprobadas, monto, imágenes firmadas. */
@@ -26,24 +27,26 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const repositorio = getClaimRepository();
     const siniestro = await repositorio.obtenerSiniestroPorId(orden.siniestroId);
-    const vehiculo = siniestro
-      ? await repositorio.obtenerVehiculoPorId(siniestro.vehiculoId)
-      : null;
-    const inspeccion = siniestro
-      ? await repositorio.obtenerInspeccionPorSiniestro(siniestro.id)
-      : null;
-    const evaluaciones = inspeccion
-      ? await repositorio.listarEvaluacionesPorInspeccion(inspeccion.id)
-      : [];
-    const imagenes = siniestro ? await repositorio.listarImagenes(siniestro.id) : [];
-    const almacen = getStorageService();
-    const imagenesConUrl = await Promise.all(
-      imagenes.map(async (img) => ({
-        id: img.id,
-        orden: img.orden,
-        url: await almacen.urlFirmado(img.storagePath, EXPIRACION_URL_FIRMADA_SEG),
-      })),
-    );
+    const [vehiculo, evaluaciones, imagenesConUrl] = await Promise.all([
+      siniestro ? repositorio.obtenerVehiculoPorId(siniestro.vehiculoId) : null,
+      siniestro
+        ? repositorio
+            .obtenerInspeccionPorSiniestro(siniestro.id)
+            .then((inspeccion) =>
+              inspeccion ? repositorio.listarEvaluacionesPorInspeccion(inspeccion.id) : [],
+            )
+        : [],
+      siniestro
+        ? repositorio.listarImagenes(siniestro.id).then(async (imagenes) => {
+            const urls = await firmarEvidencias(
+              getStorageService(),
+              imagenes.map((imagen) => imagen.storagePath),
+              EXPIRACION_URL_FIRMADA_SEG,
+            );
+            return imagenes.map(({ id, orden }, i) => ({ id, orden, url: urls[i] }));
+          })
+        : [],
+    ]);
 
     return NextResponse.json({
       orden,

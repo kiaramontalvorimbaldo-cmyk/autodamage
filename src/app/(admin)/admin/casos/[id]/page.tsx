@@ -28,11 +28,12 @@ export default async function CasoAdmin({ params }: { params: Promise<{ id: stri
     'ADMIN',
   );
   const auditoria = getAuditRepository();
-  const registros = [
-    ...(await auditoria.listarPorEntidad('siniestro', id)),
-    ...(await auditoria.listarPorEntidad('siniestros', id)),
-    ...(detalle.orden ? await auditoria.listarPorEntidad('ordenes_trabajo', detalle.orden.id) : []),
-  ].sort((a, b) => a.creadoEn.localeCompare(b.creadoEn));
+  const grupos = await Promise.all([
+    auditoria.listarPorEntidad('siniestro', id),
+    auditoria.listarPorEntidad('siniestros', id),
+    detalle.orden ? auditoria.listarPorEntidad('ordenes_trabajo', detalle.orden.id) : [],
+  ]);
+  const registros = grupos.flat().sort((a, b) => a.creadoEn.localeCompare(b.creadoEn));
   return (
     <section className="space-y-5">
       <Link href="/admin/casos" className="text-primary underline">
@@ -40,7 +41,7 @@ export default async function CasoAdmin({ params }: { params: Promise<{ id: stri
       </Link>
       <h1 className="text-2xl font-semibold">Siniestro {id.slice(0, 8)}</h1>
       <Link
-        href={`/admin/reportes/${id}`}
+        href={`/admin/casos/${id}/informe`}
         className="inline-block rounded-lg bg-primary px-4 py-2 text-white"
       >
         Informe del siniestro / PDF

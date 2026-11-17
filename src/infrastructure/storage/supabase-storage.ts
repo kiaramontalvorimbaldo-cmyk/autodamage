@@ -29,13 +29,27 @@ export class SupabaseStorageService implements StorageService {
     if (error || !data) {
       throw new AppError('STORAGE_ERROR', 404, 'No se pudo descargar la evidencia');
     }
-    const bytes = new Uint8Array(await data.arrayBuffer());
-    return Buffer.from(bytes);
+    return Buffer.from(await data.arrayBuffer());
   }
 
   async eliminar(camino: string): Promise<void> {
     const { error } = await getAdminClient().storage.from(BUCKET_EVIDENCIAS).remove([camino]);
     if (error) throw new AppError('STORAGE_ERROR', 502, 'No se pudo limpiar la evidencia');
+  }
+
+  async urlFirmados(caminos: string[], expiracionSegundos: number): Promise<string[]> {
+    if (caminos.length === 1) return [await this.urlFirmado(caminos[0], expiracionSegundos)];
+    const { data, error } = await getAdminClient()
+      .storage.from(BUCKET_EVIDENCIAS)
+      .createSignedUrls([...new Set(caminos)], expiracionSegundos);
+    if (error) throw new AppError('STORAGE_ERROR', 502, 'No se pudo generar la URL firmada');
+
+    const urls = new Map(data.map((item) => [item.path, item.error ? null : item.signedUrl]));
+    return caminos.map((camino) => {
+      const url = urls.get(camino);
+      if (!url) throw new AppError('STORAGE_ERROR', 502, 'No se pudo generar la URL firmada');
+      return url;
+    });
   }
 
   async urlFirmado(camino: string, expiracionSegundos: number): Promise<string> {

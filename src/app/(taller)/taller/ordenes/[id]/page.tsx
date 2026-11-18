@@ -1,5 +1,6 @@
 'use client';
 
+import { IncidentSummary } from '@/components/claim/incident-summary';
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 import { ErrorState } from '@/components/ErrorState';
@@ -83,9 +84,7 @@ export default function DetalleOrdenPage({ params }: { params: Promise<{ id: str
           {detalle.vehiculo.matricula}
         </p>
       )}
-      {detalle.siniestro?.descripcion && (
-        <p className="text-sm text-gray-700">{detalle.siniestro.descripcion}</p>
-      )}
+      <IncidentSummary descripcion={detalle.siniestro?.descripcion} />
 
       <section>
         <h2 className="text-sm font-semibold">Piezas aprobadas</h2>

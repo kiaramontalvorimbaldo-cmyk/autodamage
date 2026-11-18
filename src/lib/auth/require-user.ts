@@ -9,6 +9,10 @@ export type UsuarioSesion = { usuarioId: string; nombre: string; rol: Rol };
 
 /** React comparte la resolución solo dentro de la petición de render actual. */
 export const requireUser = cache(async (): Promise<UsuarioSesion> => {
+  if (process.env.DATA_BACKEND === 'local') {
+    const { currentLocalUser } = await import('@/infrastructure/local/auth');
+    return currentLocalUser();
+  }
   const client = await createServerSupabaseClient();
   const claims = await client.auth.getClaims();
   let usuarioId = claims.data?.claims.sub;

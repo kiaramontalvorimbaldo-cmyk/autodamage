@@ -25,6 +25,12 @@ export async function refreshSession(request: NextRequest) {
     return target;
   }
   try {
+    if (process.env.DATA_BACKEND === 'local') {
+      const path = request.nextUrl.pathname;
+      return esRutaProtegida(path) && !request.cookies.get('autodamage_session')?.value
+        ? redirectTo('/login')
+        : response;
+    }
     const env = getEnv();
     const client = createServerClient(
       env.NEXT_PUBLIC_SUPABASE_URL,

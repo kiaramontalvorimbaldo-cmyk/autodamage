@@ -20,6 +20,9 @@ describe('aislamiento de la verificación de Jenkins', () => {
   it('debería reemplazar credenciales y destinos heredados por simulaciones locales', () => {
     const base = {
       AI_PROVIDER: 'gemini',
+      DATA_BACKEND: 'local',
+      DATABASE_URL: 'postgresql://privada-no-usar',
+      LOCAL_STORAGE_SECRET: 'privada-no-usar',
       GEMINI_API_KEY: 'privada-no-usar',
       SUPABASE_SERVICE_ROLE_KEY: 'privada-no-usar',
       NEXT_PUBLIC_SUPABASE_URL: 'https://produccion.example',
@@ -30,6 +33,9 @@ describe('aislamiento de la verificación de Jenkins', () => {
     };
     const env = ciEnvironment(base);
     expect(env.AI_PROVIDER).toBe('mock');
+    expect(env.DATA_BACKEND).toBe('supabase');
+    expect(env.DATABASE_URL).toBe('');
+    expect(env.LOCAL_STORAGE_SECRET).toBe('');
     expect(env.NEXT_PUBLIC_SUPABASE_URL).toBe('http://127.0.0.1:54321');
     expect(env.E2E_BASE_URL).toBe('http://127.0.0.1:3000');
     expect(env.E2E_EXTERNAL_SERVER).toBe('');

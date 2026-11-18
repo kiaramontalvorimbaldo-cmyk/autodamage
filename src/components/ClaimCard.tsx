@@ -23,7 +23,11 @@ export function ClaimCard({ siniestro }: { siniestro: Siniestro }) {
           <dt>Incidente</dt>
           <dd>{formatIsoDate(siniestro.fechaIncidente)}</dd>
         </div>
-        {siniestro.descripcion && <p className="pt-1 text-gray-500">{siniestro.descripcion}</p>}
+        {siniestro.descripcion && (
+          <p className="line-clamp-3 whitespace-pre-line pt-1 text-gray-500">
+            {siniestro.descripcion}
+          </p>
+        )}
         {siniestro.etiquetas.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-1" aria-label="Etiquetas">
             {siniestro.etiquetas.map((etiqueta) => (

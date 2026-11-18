@@ -1,3 +1,4 @@
+import { describirIncidente } from '@/application/validations/incident';
 import { NextRequest, NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/errors';
 import { requerirSesion } from '@/lib/session';
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
         aseguradoId: auth.sesion.usuarioId,
         id: parseado.data.solicitud_id,
         vehiculoId: parseado.data.vehiculo_id,
-        descripcion: parseado.data.descripcion ?? null,
+        descripcion: describirIncidente(parseado.data.detalles),
         latitud: parseado.data.latitud,
         longitud: parseado.data.longitud,
         fechaIncidente: parseado.data.fecha_incidente,

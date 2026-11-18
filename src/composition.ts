@@ -21,6 +21,8 @@ import { SupabaseStorageService } from '@/infrastructure/storage/supabase-storag
 import type { StaffRepository } from '@/application/ports/staff-repository';
 import { SupabaseStaffRepository } from '@/infrastructure/supabase/supabase-staff-repository';
 import { SharpImageService } from '@/infrastructure/image/image-service';
+import { LocalStorageService } from '@/infrastructure/local/storage';
+import { LocalStaffRepository } from '@/infrastructure/local/staff-repository';
 
 /**
  * Composition root: instancia los adaptadores según AI_PROVIDER
@@ -48,6 +50,7 @@ export function getAuditRepository(): AuditRepository {
 }
 
 export function getStorageService(): StorageService {
+  if (process.env.DATA_BACKEND === 'local') return new LocalStorageService();
   return new SupabaseStorageService();
 }
 
@@ -66,6 +69,7 @@ export function getRateLimiter(): TokenBucketRateLimiter {
 }
 
 export function getStaffRepository(): StaffRepository {
+  if (process.env.DATA_BACKEND === 'local') return new LocalStaffRepository();
   return new SupabaseStaffRepository();
 }
 

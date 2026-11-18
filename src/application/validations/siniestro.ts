@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { detallesIncidenteSchema } from './incident';
 
 /**
  * Esquema de creación de siniestro.
  * Coordenadas en rangos válidos; fecha del incidente ISO 8601.
  */
 export const crearSiniestroSchema = z.object({
+  detalles: detallesIncidenteSchema,
   solicitud_id: z.string().uuid().optional(),
   vehiculo_id: z.string().uuid('El vehículo debe ser un UUID válido'),
   descripcion: z

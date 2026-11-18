@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAuthRouteClient } from '@/infrastructure/supabase/route-client';
 import { loginSchema } from '@/application/validations/auth';
 import { esRol, portalPorRol } from '@/lib/portal-routes';
+import { loginLocal } from '@/infrastructure/local/auth';
+import { toErrorResponse } from '@/lib/errors';
 import { mensajeDeCodigo } from '@/lib/user-messages';
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -25,6 +27,17 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 },
     );
+  if (process.env.DATA_BACKEND === 'local') {
+    try {
+      return await loginLocal(
+        parsed.data.email,
+        parsed.data.password,
+        request.headers.get('user-agent')?.includes('AutoDamageAndroid/') ?? false,
+      );
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }
   const { supabase, withCookies } = createAuthRouteClient(request);
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error || !data.user)

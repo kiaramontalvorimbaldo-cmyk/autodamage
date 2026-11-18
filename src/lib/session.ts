@@ -4,9 +4,14 @@ import { requireUser } from '@/lib/auth/require-user';
 import { AppError } from '@/lib/errors';
 import { mensajeDeCodigo } from '@/lib/user-messages';
 export type Sesion = { usuarioId: string; rol: Rol };
-export async function obtenerSesion(_request: NextRequest): Promise<Sesion | null> {
+export async function obtenerSesion(request: NextRequest): Promise<Sesion | null> {
   try {
-    const user = await requireUser();
+    const user =
+      process.env.DATA_BACKEND === 'local'
+        ? await import('@/infrastructure/local/auth').then(({ localUser, tokenFrom }) =>
+            localUser(tokenFrom(request)),
+          )
+        : await requireUser();
     return { usuarioId: user.usuarioId, rol: user.rol };
   } catch (error) {
     if (error instanceof AppError && (error.status === 401 || error.status === 403)) return null;

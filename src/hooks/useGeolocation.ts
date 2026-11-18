@@ -1,5 +1,6 @@
 'use client';
 
+import { androidDisponible, solicitarAndroid } from '@/lib/android-bridge';
 import { useCallback, useState } from 'react';
 
 export type Posicion = { latitud: number; longitud: number; precisionM: number };
@@ -34,7 +35,7 @@ export function useGeolocation(): UseGeolocationResult {
 
   const solicitar = useCallback(async (): Promise<Posicion | null> => {
     setError(null);
-    if (!navigator.geolocation?.getCurrentPosition) {
+    if (!androidDisponible() && !navigator.geolocation?.getCurrentPosition) {
       setError('NO_DISPONIBLE');
       return null;
     }
@@ -69,11 +70,13 @@ export function useGeolocation(): UseGeolocationResult {
             { enableHighAccuracy: altaPrecision, timeout: 10_000, maximumAge: 0 },
           );
         });
-      const resultado = await leer(true).catch((e: unknown) => {
-        if (e instanceof Error && (e.message === 'NO_DISPONIBLE' || e.message === 'TIMEOUT'))
-          return leer(false);
-        throw e;
-      });
+      const resultado = androidDisponible()
+        ? await solicitarAndroid<Posicion>('location')
+        : await leer(true).catch((e: unknown) => {
+            if (e instanceof Error && (e.message === 'NO_DISPONIBLE' || e.message === 'TIMEOUT'))
+              return leer(false);
+            throw e;
+          });
       setPosicion(resultado);
       return resultado;
     } catch (e) {

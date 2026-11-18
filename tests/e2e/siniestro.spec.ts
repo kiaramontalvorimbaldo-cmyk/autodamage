@@ -33,6 +33,14 @@ test('flujo completo de nuevo siniestro con cámara falsa', async ({ page }) => 
     .click();
   await page.getByRole('button', { name: 'Siguiente' }).click();
 
+  await page.getByLabel('Tipo de incidente').selectOption('ESTACIONADO');
+  await page.getByLabel('Lugar de referencia').fill('Avenida América, Cochabamba');
+  await page
+    .getByLabel('Descripción')
+    .fill('El vehículo estaba estacionado y encontré un golpe en el faro izquierdo.');
+  await page.getByLabel('Daños observados').fill('Faro delantero izquierdo roto.');
+  await page.getByLabel('¿Participaron otros vehículos?').selectOption('NO_SE');
+  await page.getByLabel('¿Hubo personas heridas?').selectOption('NO');
   await page.getByLabel('Fecha y hora del incidente').fill('2026-10-01T10:30');
   await page.getByLabel('Latitud').fill('-1.831239');
   await page.getByLabel('Longitud').fill('-78.183406');

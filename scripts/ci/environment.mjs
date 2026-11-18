@@ -7,11 +7,17 @@ import process from 'node:process';
 export function ciEnvironment(base = process.env) {
   const env = { ...base };
   for (const name of Object.keys(env)) {
-    if (/^(SUPABASE_|NEXT_PUBLIC_SUPABASE_|GEMINI_|DEV_|E2E_)/i.test(name)) env[name] = '';
+    if (
+      /^(SUPABASE_|NEXT_PUBLIC_SUPABASE_|GEMINI_|DEV_|E2E_|LOCAL_STORAGE_|DATABASE_URL$|AUTODAMAGE_LOCAL_DIR$|DATA_BACKEND$)/i.test(
+        name,
+      )
+    )
+      env[name] = '';
   }
   return {
     ...env,
     CI: 'true',
+    DATA_BACKEND: 'supabase',
     HUSKY: '0',
     NEXT_TELEMETRY_DISABLED: '1',
     AI_PROVIDER: 'mock',

@@ -41,3 +41,16 @@ next-env.d.ts
 
 .next-followup/
 .next-*/
+.local/
+node-compile-cache/
+
+# Android: datos y compilaciones locales
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.idea/
+*.apk
+
+# Reportes y entregables de Jenkins
+/reports/
+/artifacts/

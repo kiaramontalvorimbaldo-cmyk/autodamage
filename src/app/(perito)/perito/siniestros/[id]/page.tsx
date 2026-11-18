@@ -1,5 +1,6 @@
 'use client';
 
+import { IncidentSummary } from '@/components/claim/incident-summary';
 import dynamic from 'next/dynamic';
 import { AdditionalEvidence } from '@/components/claim/additional-evidence';
 import { RecoverWorkOrder, RecoverAnalysis } from '@/components/recover-work-order';
@@ -204,6 +205,7 @@ export default function DetallePeritoPage({ params }: { params: Promise<{ id: st
           Orden: {detalle.orden.estado}. Solo la cuenta vinculada a ese taller puede verla.
         </p>
       )}
+      <IncidentSummary descripcion={siniestro.descripcion} />
       <AnalysisProvenance inspeccion={inspeccion} />
       <AnalysisBasis inspeccion={inspeccion} />
       {siniestro.analisisEstado === 'EN_PROCESO' &&

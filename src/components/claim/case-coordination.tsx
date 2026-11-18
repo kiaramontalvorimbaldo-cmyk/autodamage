@@ -1,5 +1,7 @@
 'use client';
 
+import { crearId } from '@/lib/id';
+
 import { useEffect, useRef, useState } from 'react';
 import type { CoordinacionCaso } from '@/application/ports/case-coordination';
 import { apiFetch } from '@/lib/api-client';
@@ -56,8 +58,7 @@ export function CaseCoordination({ siniestroId, rol, completado = false }: Props
     event.preventDefault();
     const contenido = texto.trim();
     if (!contenido || enviando) return;
-    if (intento.current?.contenido !== contenido)
-      intento.current = { id: crypto.randomUUID(), contenido };
+    if (intento.current?.contenido !== contenido) intento.current = { id: crearId(), contenido };
     setEnviando(true);
     setError('');
     setAviso('');

@@ -1,5 +1,13 @@
 'use client';
 
+import { crearId } from '@/lib/id';
+
+import { IncidentDetails } from './incident-details';
+import {
+  detallesIncidenteSchema,
+  describirIncidente,
+  DETALLES_INICIALES,
+} from '@/application/validations/incident';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -94,7 +102,8 @@ export function NewClaimWizard() {
   const [paso, setPaso] = useState(1);
   const [vehiculos, setVehiculos] = useState<Vehiculo[] | null>(null);
   const [vehiculoId, setVehiculoId] = useState('');
-  const [descripcion, setDescripcion] = useState('');
+  const [detalles, setDetalles] = useState({ ...DETALLES_INICIALES });
+  const detallesValidados = detallesIncidenteSchema.safeParse(detalles);
   const [fechaIncidente, setFechaIncidente] = useState('');
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
@@ -118,9 +127,24 @@ export function NewClaimWizard() {
     }
   }, [posicion]);
 
-  const ayuda = ayudaDeSiguiente(paso, vehiculoId, fotos.length, fechaIncidente, latitud, longitud);
+  const ayudaBase = ayudaDeSiguiente(
+    paso,
+    vehiculoId,
+    fotos.length,
+    fechaIncidente,
+    latitud,
+    longitud,
+  );
+  const ayuda =
+    ayudaBase ||
+    (paso === 2 && !detallesValidados.success ? detallesValidados.error.issues[0].message : null);
   const hayDatos = Boolean(
-    vehiculoId || descripcion || fechaIncidente || fotos.length > 0 || latitud || longitud,
+    vehiculoId ||
+    Object.values(detalles).some(Boolean) ||
+    fechaIncidente ||
+    fotos.length > 0 ||
+    latitud ||
+    longitud,
   );
   const coordenadasSonValidas = coordenadasValidas(latitud, longitud);
   const latNumero = Number(latitud);
@@ -142,7 +166,7 @@ export function NewClaimWizard() {
     setFotos((actuales) => [
       ...actuales,
       {
-        id: crypto.randomUUID(),
+        id: crearId(),
         blob: resultado.blob,
         capturadaEn: resultado.capturadaEn,
         latitud: posicion?.latitud ?? (latitud ? Number(latitud) : null),
@@ -169,6 +193,7 @@ export function NewClaimWizard() {
     setError(null);
     if (!vehiculoId) return setError('Selecciona un vehículo');
     if (!fechaIncidente) return setError('Indica la fecha del incidente');
+    if (!detallesValidados.success) return setError(detallesValidados.error.issues[0].message);
     const lat = Number(latitud);
     const lon = Number(longitud);
     if (!latitud || !longitud || Number.isNaN(lat) || Number.isNaN(lon)) {
@@ -178,7 +203,7 @@ export function NewClaimWizard() {
       return setError(`Captura al menos ${MIN_FOTOS} fotos`);
     }
 
-    solicitudId.current ??= crypto.randomUUID();
+    solicitudId.current ??= crearId();
     setEnviando(true);
     try {
       const siniestro = await apiFetch<{ id: string }>('/api/siniestros', {
@@ -186,7 +211,7 @@ export function NewClaimWizard() {
         body: {
           solicitud_id: solicitudId.current,
           vehiculo_id: vehiculoId,
-          descripcion: descripcion || null,
+          detalles: detallesValidados.data,
           fecha_incidente: new Date(fechaIncidente).toISOString(),
           latitud: lat,
           longitud: lon,
@@ -335,16 +360,7 @@ export function NewClaimWizard() {
       {paso === 2 && (
         <section className="space-y-4">
           <h2 className="text-sm font-medium">2. Datos del incidente</h2>
-          <label className="block">
-            <span className="text-sm font-medium">Descripción</span>
-            <textarea
-              value={descripcion}
-              maxLength={2000}
-              onChange={(e) => setDescripcion(e.target.value)}
-              className="mt-1 w-full rounded-md border px-3 py-2"
-              rows={3}
-            />
-          </label>
+          <IncidentDetails value={detalles} onChange={setDetalles} />
           <label className="block">
             <span className="text-sm font-medium">Fecha y hora del incidente</span>
             <input
@@ -470,6 +486,17 @@ export function NewClaimWizard() {
               <dd className="inline">{fechaIncidente || '—'}</dd>
             </div>
           </dl>
+          {detallesValidados.success && (
+            <div className="rounded-md border p-3">
+              <h3 className="text-sm font-medium">Datos del incidente</h3>
+              <p className="mt-2 whitespace-pre-line text-sm">
+                {describirIncidente(detallesValidados.data)}
+              </p>
+              <Button variant="outline" onClick={() => setPaso(2)} disabled={enviando}>
+                Corregir detalles
+              </Button>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setPaso(3)}>
               Atrás

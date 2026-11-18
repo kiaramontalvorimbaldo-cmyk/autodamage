@@ -1,4 +1,7 @@
 'use client';
+
+import { crearId } from '@/lib/id';
+
 import { useEffect, useState } from 'react';
 import { CameraCapture, type CapturaResult } from '@/components/camera/CameraCapture';
 import { apiFetch } from '@/lib/api-client';
@@ -120,7 +123,7 @@ export function AdditionalEvidence({
           </p>
           <CameraCapture
             deshabilitado={ocupado || fotos.length + guardadas >= 5}
-            onCaptura={(foto) => setFotos((f) => [...f, { ...foto, id: crypto.randomUUID() }])}
+            onCaptura={(foto) => setFotos((f) => [...f, { ...foto, id: crearId() }])}
           />
           <ul className="space-y-1 text-sm">
             {fotos.map((foto, n) => (

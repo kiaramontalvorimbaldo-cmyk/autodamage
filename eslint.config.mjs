@@ -7,11 +7,15 @@ const eslintConfig = tseslint.config(
   {
     ignores: [
       'node_modules/**',
+      '.local/**',
+      'node-compile-cache/**',
       '.next/**',
       '.next-design/**',
       '.next-followup/**',
       '.next-*/**',
       'coverage/**',
+      'reports/**',
+      'artifacts/**',
       'playwright-report/**',
       'test-results/**',
       'junit-results/**',

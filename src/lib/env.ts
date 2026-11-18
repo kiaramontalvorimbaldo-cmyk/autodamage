@@ -32,7 +32,18 @@ export type Env = z.infer<typeof envSchema>;
  * Lanza Error con el detalle de todas las variables inválidas o faltantes.
  */
 export function parseEnv(raw: Record<string, string | undefined>): Env {
-  const parsed = envSchema.safeParse(raw);
+  const values =
+    raw.DATA_BACKEND === 'local'
+      ? {
+          ...raw,
+          NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1',
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'unused-local',
+          SUPABASE_SERVICE_ROLE_KEY: 'unused-local',
+          GEMINI_API_KEY: raw.GEMINI_API_KEY || (raw.AI_PROVIDER === 'mock' ? 'mock' : ''),
+          GEMINI_MODEL: raw.GEMINI_MODEL || (raw.AI_PROVIDER === 'mock' ? 'mock' : ''),
+        }
+      : raw;
+  const parsed = envSchema.safeParse(values);
   if (!parsed.success) {
     const detalles = parsed.error.issues.map(
       (issue) => `${issue.path.join('.')}: ${issue.message}`,

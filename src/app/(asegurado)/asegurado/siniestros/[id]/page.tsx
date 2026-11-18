@@ -1,5 +1,6 @@
 'use client';
 
+import { IncidentSummary } from '@/components/claim/incident-summary';
 import Link from 'next/link';
 import { AdditionalEvidence } from '@/components/claim/additional-evidence';
 import { use } from 'react';
@@ -79,6 +80,7 @@ export default function DetalleSiniestroPage({ params }: { params: Promise<{ id:
       <button className="text-sm text-primary underline" onClick={() => window.location.reload()}>
         Actualizar seguimiento
       </button>
+      <IncidentSummary descripcion={siniestro.descripcion} />
       <AnalysisProvenance inspeccion={inspeccion} />
       <AnalysisBasis inspeccion={inspeccion} />
       {siniestro.estado === 'PENDIENTE' && siniestro.analisisEstado === 'NO_INICIADO' && (

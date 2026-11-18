@@ -1,4 +1,4 @@
-// Pipeline de verificación. No despliega, aplica migraciones ni necesita claves reales.
+// Verifica web, PostgreSQL aislado y APK. Solo migra la base temporal de CI; no despliega ni usa claves reales.
 def projectDirectory() {
     def value = params.PROJECT_DIR?.trim() ?: '.'
     if (!value.matches('[A-Za-z0-9_./-]+') || value.startsWith('/') || value.tokenize('/').contains('..')) {
@@ -31,6 +31,8 @@ pipeline {
     }
     parameters {
         string(name: 'PROJECT_DIR', defaultValue: '.', description: 'Carpeta que contiene package.json. Usa . si el proyecto es la raíz del repositorio.')
+        string(name: 'POSTGRES_BIN', defaultValue: '', description: 'Carpeta de initdb y pg_ctl. Vacío: PostgreSQL 18 estándar en Windows o PATH en Linux. El agente debe poder crear una base temporal.')
+        string(name: 'ANDROID_SDK_PATH', defaultValue: '', description: 'Android SDK del agente, con Build Tools 36.0.0 y plataforma 36 o 37. Vacío: ANDROID_SDK_ROOT/ANDROID_HOME o ubicación del usuario.')
         string(name: 'SERENITY_JDK_TOOL', defaultValue: 'Java 25', description: 'Nombre del JDK configurado en Administrar Jenkins > Tools (Java 17 o superior).')
         string(name: 'SERENITY_MAVEN_TOOL', defaultValue: 'Maven 3.8.6', description: 'Nombre de Maven configurado en Administrar Jenkins > Tools.')
     }
@@ -48,6 +50,8 @@ pipeline {
                     env.UNIT_STARTED = 'false'
                     env.APP_BUILD_OK = 'false'
                     env.SERENITY_STARTED = 'false'
+                    env.POSTGRES_STARTED = 'false'
+                    env.ANDROID_STARTED = 'false'
                 }
                 checkout scm
                 script {
@@ -56,7 +60,7 @@ pipeline {
                             error('PROJECT_DIR no contiene el proyecto Node.js. Revisa la carpeta configurada.')
                         }
                         // Solo salidas generadas: evita publicar resultados de un build anterior.
-                        ['coverage', 'playwright-report', 'junit-results', 'test-results', 'serenity-tests/target'].each { folder ->
+                        ['coverage', 'playwright-report', 'junit-results', 'test-results', 'serenity-tests/target', 'reports/postgres', 'reports/android', 'artifacts/android'].each { folder ->
                             dir(folder) { deleteDir() }
                         }
                         env.REPORTS_READY = 'true'
@@ -107,6 +111,33 @@ pipeline {
                 }
             }
         }
+        stage('API con PostgreSQL real aislado') {
+            when { expression { env.APP_BUILD_OK == 'true' } }
+            steps {
+                script {
+                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                        withEnv(["POSTGRES_BIN=${params.POSTGRES_BIN?.trim() ?: ''}"]) {
+                            env.POSTGRES_STARTED = 'true'
+                            projectCommand('npm run test:postgres:ci')
+                        }
+                    }
+                }
+            }
+        }
+        stage('Generar y verificar APK Android') {
+            steps {
+                script {
+                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                        def javaHome = tool(name: params.SERENITY_JDK_TOOL, type: 'hudson.model.JDK')
+                        def androidSdk = params.ANDROID_SDK_PATH?.trim() ?: env.ANDROID_SDK_ROOT ?: env.ANDROID_HOME ?: ''
+                        withEnv(["JAVA_HOME=${javaHome}", "ANDROID_SDK_ROOT=${androidSdk}"]) {
+                            env.ANDROID_STARTED = 'true'
+                            projectCommand('npm run android:ci')
+                        }
+                    }
+                }
+            }
+        }
         stage('Pruebas Serenity de API') {
             when { expression { env.APP_BUILD_OK == 'true' } }
             steps {
@@ -130,6 +161,19 @@ pipeline {
                     inProject {
                         // Una publicación fallida no impide archivar los demás resultados.
                         // Acceso directo: env[flag] requiere una firma bloqueada por Jenkins.
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                            if (isUnix()) { sh 'node scripts/ci/cleanup-postgres.mjs' } else { bat '@echo off\r\nnode scripts/ci/cleanup-postgres.mjs' }
+                        }
+                        if (env.POSTGRES_STARTED == 'true') {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                junit(testResults: 'reports/postgres/junit.xml', allowEmptyResults: false)
+                            }
+                        }
+                        if (env.ANDROID_STARTED == 'true') {
+                            catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                junit(testResults: 'reports/android/junit.xml', allowEmptyResults: false)
+                            }
+                        }
                         if (env.UNIT_STARTED == 'true') {
                             catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
                                 junit(testResults: 'junit-results/vitest.xml', allowEmptyResults: false)
@@ -150,7 +194,14 @@ pipeline {
                                 publishHTML(target: [reportName: 'Serenity API Report', reportDir: 'serenity-tests/target/site/serenity', reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
                             }
                         }
-                        archiveArtifacts(artifacts: 'junit-results/vitest.xml,coverage/**,serenity-tests/target/failsafe-reports/**,serenity-tests/target/site/serenity/**,serenity-tests/target/cucumber-results.json', allowEmptyArchive: true)
+                        ['postgres': 'PostgreSQL real', 'android': 'Compilación APK Android'].each { folder, title ->
+                            if (fileExists("reports/${folder}/index.html")) {
+                                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+                                    publishHTML(target: [reportName: title, reportDir: "reports/${folder}", reportFiles: 'index.html', includes: '**/*', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: false])
+                                }
+                            }
+                        }
+                        archiveArtifacts(artifacts: 'junit-results/vitest.xml,coverage/**,serenity-tests/target/failsafe-reports/**,serenity-tests/target/site/serenity/**,serenity-tests/target/cucumber-results.json,reports/postgres/**,reports/android/**,artifacts/android/*.apk,artifacts/android/metadata.json', allowEmptyArchive: true, fingerprint: true)
                     }
                 }
             }

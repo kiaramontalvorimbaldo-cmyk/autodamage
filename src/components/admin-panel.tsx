@@ -122,7 +122,7 @@ export function AdminPanel({ vista }: { vista: 'casos' | 'personal' | 'auditoria
                       <p className="text-sm">
                         {c.estado} · {c.ruta ?? 'Sin ruta'}
                       </p>
-                      <p className="mt-2 text-sm">{c.descripcion}</p>
+                      <p className="mt-2 whitespace-pre-line text-sm">{c.descripcion}</p>
                       <p className="mt-2 text-sm">
                         {orden
                           ? `Taller: ${taller?.nombre ?? 'No disponible'} · Orden ${orden.estado}`

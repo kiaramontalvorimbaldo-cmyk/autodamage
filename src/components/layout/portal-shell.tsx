@@ -1,5 +1,6 @@
 'use client';
 
+import { Notifications } from '@/components/claim/notifications';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type FormEvent, type ReactNode } from 'react';
@@ -156,7 +157,10 @@ export function PortalShell({
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" /> AutoDamage AI
           </span>
         </div>
-        <div className="mx-auto max-w-5xl px-4 py-6 md:py-8">{children}</div>
+        <div className="mx-auto max-w-5xl px-4 py-6 md:py-8">
+          {rol === 'ASEGURADO' && <Notifications />}
+          {children}
+        </div>
       </div>
 
       {/* Barra inferior (móvil) */}

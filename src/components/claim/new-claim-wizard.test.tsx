@@ -122,7 +122,9 @@ describe('NewClaimWizard', () => {
     render(<NewClaimWizard />);
 
     expect(await screen.findByText('Aún no tienes vehículos')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Registrar mi primer vehículo' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Registrar mi primer vehículo' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Registrar otro vehículo' })).toBeInTheDocument();
   });
 
@@ -136,7 +138,7 @@ describe('NewClaimWizard', () => {
     expect(screen.getByText('Completa la fecha del incidente para continuar')).toBeInTheDocument();
   });
 
-  it('habilita "Siguiente" cuando la fecha y la ubicación son válidas', async () => {
+  it('exige los detalles guiados además de la fecha y ubicación', async () => {
     const user = userEvent.setup();
     render(<NewClaimWizard />);
 
@@ -144,9 +146,25 @@ describe('NewClaimWizard', () => {
     await user.click(screen.getByRole('button', { name: 'Siguiente' }));
 
     await user.type(screen.getByLabelText('Fecha y hora del incidente'), '2025-01-15T10:30');
-    await user.type(screen.getByLabelText('Latitud'), '17.386345932997905');
-    await user.type(screen.getByLabelText('Longitud'), '-66.14062325484846');
+    await user.click(screen.getByLabelText('Latitud'));
+    await user.paste('17.386345932997905');
+    await user.click(screen.getByLabelText('Longitud'));
+    await user.paste('-66.14062325484846');
 
+    expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+    await user.selectOptions(screen.getByLabelText('Tipo de incidente'), 'ESTACIONADO');
+    await user.click(screen.getByLabelText('Lugar de referencia'));
+    await user.paste('Avenida América, Cochabamba');
+    await user.click(screen.getByLabelText('Descripción'));
+    await user.paste('El vehículo estaba estacionado y encontré un golpe en su parte delantera.');
+    await user.click(screen.getByLabelText('Daños observados'));
+    await user.paste('Faro delantero izquierdo roto.');
+    await user.selectOptions(screen.getByLabelText('¿Participaron otros vehículos?'), 'NO_SE');
+    await user.selectOptions(screen.getByLabelText('¿Hubo personas heridas?'), 'NO');
     expect(screen.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Siguiente' }));
+    await user.click(screen.getByRole('button', { name: 'Atrás' }));
+    expect(screen.getByLabelText('Lugar de referencia')).toHaveValue('Avenida América, Cochabamba');
+    expect(screen.getByLabelText('¿Participaron otros vehículos?')).toHaveValue('NO_SE');
   });
 });

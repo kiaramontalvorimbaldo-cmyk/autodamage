@@ -1,5 +1,7 @@
 'use client';
 
+import { AndroidCamera } from './android-camera';
+import { androidDisponible } from '@/lib/android-bridge';
 import { useState } from 'react';
 import { useCamera } from '@/hooks/useCamera';
 import { procesarImagen } from '@/lib/faceBlur';
@@ -69,6 +71,9 @@ export function CameraCapture({
       : errorProcesamiento !== null
         ? MENSAJES_ERROR[errorProcesamiento]
         : null;
+
+  if (androidDisponible())
+    return <AndroidCamera onCaptura={onCaptura} deshabilitado={deshabilitado} />;
 
   return (
     <div className="space-y-3">

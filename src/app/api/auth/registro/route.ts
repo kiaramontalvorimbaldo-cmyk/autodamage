@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAuthRouteClient } from '@/infrastructure/supabase/route-client';
 import { registroSchema } from '@/application/validations/auth';
 import { mensajeDeCodigo } from '@/lib/user-messages';
+import { registerLocal } from '@/infrastructure/local/auth';
+import { toErrorResponse } from '@/lib/errors';
 
 /**
  * POST /api/auth/registro
@@ -34,6 +36,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (process.env.DATA_BACKEND === 'local') {
+    try {
+      return await registerLocal(
+        parsed.data.email,
+        parsed.data.password,
+        parsed.data.nombreCompleto,
+      );
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }
   const { supabase, withCookies } = createAuthRouteClient(request);
 
   const { data, error } = await supabase.auth.signUp({

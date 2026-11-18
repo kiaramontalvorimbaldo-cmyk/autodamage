@@ -1,6 +1,8 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getEnv } from '@/lib/env';
+import { LocalDatabase } from '@/infrastructure/local/database';
+import { tokenFrom, localUser } from '@/infrastructure/local/auth';
 
 /** Elemento devuelto por Supabase en `setAll` (cookie con sus opciones). */
 type SetAllCookie = { name: string; value: string; options: CookieOptions };
@@ -13,6 +15,18 @@ type SetAllCookie = { name: string; value: string; options: CookieOptions };
  * con su propio JSON mediante `withCookies(response)`.
  */
 export function createAuthRouteClient(request: NextRequest) {
+  if (process.env.DATA_BACKEND === 'local') {
+    const client = {
+      rpc: async (name: string, args: Record<string, unknown>) => {
+        const user = await localUser(tokenFrom(request));
+        return new LocalDatabase(user.usuarioId).rpc(name, args);
+      },
+    };
+    return {
+      supabase: client as unknown as ReturnType<typeof createServerClient>,
+      withCookies: <T extends Response>(response: T) => response,
+    };
+  }
   const env = getEnv();
   const pendingCookies: SetAllCookie[] = [];
 
